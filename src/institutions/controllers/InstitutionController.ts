@@ -148,9 +148,43 @@ class InstitutionController {
         error: { message: "Erro ao editar instituição" },
       });
     }
-
-    } 
-
   }
+
+  async updateStatus(request: Request, response: Response): Promise<Response> {
+    const { institutionId } = request.params;
+    const { status } = request.body;
+
+    if (status == undefined || status == null || !institutionId) {
+      return response.status(400).json({
+        error: { message: "os paramentros não atendem a requisição, falta status ou institutionId" },
+      });
+    }
+
+    if (typeof status !== "boolean") {
+      return response.status(400).json({
+        error: { message: "o parâmetro status deve ser booleano" },
+      });
+    }
+
+    try {
+      const institutionService = container.resolve(InstitutionService);
+      const existingInstitution = await institutionService.findById(institutionId, request);
+
+      if (!existingInstitution) {
+        return response.status(400).json(
+          { status: "error", message: "Id instituição não existe" }
+        );
+      }
+
+      const resp = await institutionService.updateStatus(institutionId, status ? 1 : 0, request);
+      return response.status(200).jsonp(resp);
+    } catch (error) {
+      return response.status(503).json({
+        error: { message: "Erro ao atualizar status da instituição" },
+      });
+    }
+  }
+
+}
 
 export { InstitutionController };

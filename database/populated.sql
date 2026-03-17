@@ -34,6 +34,19 @@ CREATE TABLE IF NOT EXISTS instituicao_profissional (
 );
 
 -- =========================
+-- TABELA: pacientes
+-- =========================
+CREATE TABLE IF NOT EXISTS pacientes (
+    Id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
+    id_profissional VARCHAR(36) NOT NULL,
+    data_nascimento DATE NOT NULL,
+    nome VARCHAR(150) NOT NULL,
+    status TINYINT(1) NOT NULL DEFAULT 1,
+    criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+
+-- =========================
 -- DADOS DE TESTE
 -- =========================
 

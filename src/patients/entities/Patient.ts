@@ -16,6 +16,9 @@ class Patient {
   @Column({ name: "data_nascimento" })
   bornDate: string;
 
+  @Column({ name: "id_profissional" })
+  professionalId: string;
+
   @CreateDateColumn({ name: "criado_em" })
   createdAt: Date;
 

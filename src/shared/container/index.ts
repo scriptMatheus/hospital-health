@@ -5,6 +5,8 @@ import { IProfessionalRepository } from "../../professionals/repositories/IProfe
 import { ProfessionalRepository } from "../../professionals/repositories/implementation/ProfessionalRepository";
 import { IInstitutionProfessionalRepository } from "../../institutionProfessional/repositories/IInstitutionProfessionalRepository";
 import { InstitutionProfessionalRepository } from "../../institutionProfessional/repositories/implementation/InstitutionProfessionalRepository";
+import { IPatientRepository } from "../../patients/repositories/IPatientRepository";
+import { PatientRepository } from "../../patients/repositories/implementation/PatientRepository";
 
 container.registerSingleton<IInstitutionRepository>(
     "InstitutionRepository",
@@ -19,4 +21,9 @@ container.registerSingleton<IProfessionalRepository>(
 container.registerSingleton<IInstitutionProfessionalRepository>(
     "InstitutionProfessionalRepository",
     delay(() => InstitutionProfessionalRepository)
+);
+
+container.registerSingleton<IPatientRepository>(
+    "PatientRepository",
+    delay(() => PatientRepository)
 );

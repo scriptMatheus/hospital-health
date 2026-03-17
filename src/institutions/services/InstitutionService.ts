@@ -53,6 +53,12 @@ class InstitutionService {
     const updated = await this.institutionRepository.update(institution, institutionId, prmNewConr);
     return updated;
   }
+
+  async updateStatus(institutionId: string, status: number, req:any): Promise<Institution | null> {
+    const prmNewConr = await this.defineConnection(req)
+    return this.institutionRepository.updateStatus(institutionId, status, prmNewConr);
+  }
+
   async defineConnection(req: any): Promise<DataSource> {
     const customDataSource = new DataSource({
       type: "mysql",

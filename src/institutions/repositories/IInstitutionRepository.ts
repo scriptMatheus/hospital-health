@@ -5,6 +5,7 @@ interface IInstitutionRepository {
     findById(InstitutionId: string, conSource:DataSource): Promise<Institution|null>;
     list(conSource:DataSource): Promise<Institution[]>;
     update(Institution: Institution, InstitutionId: string, conSource:DataSource): Promise<Institution | null>;
+    updateStatus(institutionId: string, status: number, conSource:DataSource): Promise<Institution | null>;
 }
 
 export { IInstitutionRepository };

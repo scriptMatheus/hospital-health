@@ -29,4 +29,10 @@ institutionRoutes.patch(
     institutionController.update
 );
 
+//update status
+institutionRoutes.patch(
+    "/status/:institutionId", authenticateRequest,
+    institutionController.updateStatus
+);
+
 export { institutionRoutes };

@@ -47,6 +47,16 @@ class InstitutionRepository implements IInstitutionRepository {
         return institutionUpdated;
     }
 
+    async updateStatus(institutionId: string, status: number, conSource:DataSource): Promise<Institution | null> {
+        this.institutionRepository = conSource.getRepository(Institution);
+        await this.institutionRepository.update(institutionId, { status });
+
+        //retorna atualizado
+        const institutionUpdated = await this.findById(institutionId, conSource);
+        await conSource.destroy();
+        return institutionUpdated;
+    }
+
 }
 
 export { InstitutionRepository };
