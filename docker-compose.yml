@@ -1,0 +1,49 @@
+version: "3.8"
+networks:
+    dream-health:
+        driver: bridge
+services:
+    api-dream-health:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        container_name: dream-health-api
+        environment:
+        - DB_HOST=mysql
+        - DB_USER=dream_health_user
+        - DB_PASSWORD=health77*
+        - DB_NAME=dream_health
+        - DB_PORT=3306
+        - DB_CHARSET=utf8mb4
+        - DB_LOGGING=false
+        - DB_SYNCHRONIZE=true
+        - TOKEN_SECRET=7*123cryptox
+        - BASE_URL=/api
+        ports:
+            - '3025:3025'
+        restart: unless-stopped
+        depends_on:
+            - mysql
+        networks:
+            - dream-health
+        command: bash -c "yarn install && yarn dev"
+    mysql:
+        image: mysql:8.0
+        container_name: dream-health-mysql
+        restart: unless-stopped
+        command: --default-authentication-plugin=mysql_native_password
+        ports:
+        - "3306:3306"
+        environment:
+            MYSQL_ROOT_PASSWORD: car3Health13
+            MYSQL_DATABASE: dream_health
+            MYSQL_USER: dream_health_user
+            MYSQL_PASSWORD: health77*
+        volumes:
+        - mysql_data:/var/lib/mysql
+        - ./database/populated.sql:/docker-entrypoint-initdb.d/populated.sql
+        networks:
+        - dream-health
+
+volumes:
+    mysql_data:
