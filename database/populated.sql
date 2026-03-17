@@ -45,6 +45,21 @@ CREATE TABLE IF NOT EXISTS pacientes (
     criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- =========================
+-- TABELA: atendimentos
+-- =========================
+CREATE TABLE IF NOT EXISTS atendimentos (
+    Id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
+    id_profissional VARCHAR(36) NOT NULL,
+    id_paciente VARCHAR(36) NOT NULL,
+    data_atendimento DATE NOT NULL,
+    hora_atendimento VARCHAR(5) NOT NULL,
+    descricao TEXT,
+    status TINYINT(1) NOT NULL DEFAULT 1,
+    criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+
 
 -- =========================
 -- DADOS DE TESTE
