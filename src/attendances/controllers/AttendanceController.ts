@@ -29,7 +29,7 @@ class AttendanceController {
     const normalizedAttendanceTime = normalizeAttendanceTime(attendanceTime);
     if (!normalizedAttendanceTime) {
       return response.status(400).json({
-        error: { message: "hora do atendimento inválida. Use HH:mm" },
+        error: { message: "hora do atendimento inválida. Use HH:mm com minutos 00 ou 30 (ex: 20:00, 20:30)" },
       });
     }
 
@@ -58,6 +58,17 @@ class AttendanceController {
         });
       }
 
+      const attendanceService = container.resolve(AttendanceService);
+      const conflictAttendance = await attendanceService.findByProfessionalAndDateTime(
+        professionalId, normalizedAttendanceDate, normalizedAttendanceTime, null, request
+      );
+
+      if (conflictAttendance) {
+        return response.status(400).json({
+          error: { message: "já existe um atendimento para este profissional nesta data e horário" },
+        });
+      }
+
       const attendanceDTO: IAttendanceDTO = {
         patientId,
         professionalId,
@@ -67,7 +78,6 @@ class AttendanceController {
         status: true,
       };
 
-      const attendanceService = container.resolve(AttendanceService);
       const resp = await attendanceService.createAttendance(attendanceDTO, request);
 
       return response.status(200).jsonp(resp);
@@ -139,7 +149,7 @@ class AttendanceController {
     const normalizedAttendanceTime = normalizeAttendanceTime(attendanceTime);
     if (!normalizedAttendanceTime) {
       return response.status(400).json({
-        error: { message: "hora do atendimento inválida. Use HH:mm" },
+        error: { message: "hora do atendimento inválida. Use HH:mm com minutos 00 ou 30 (ex: 20:00, 20:30)" },
       });
     }
 
@@ -175,6 +185,16 @@ class AttendanceController {
         return response.status(400).json(
           { status: "error", message: "Id atendimento não existe" }
         );
+      }
+
+      const conflictAttendance = await attendanceService.findByProfessionalAndDateTime(
+        professionalId, normalizedAttendanceDate, normalizedAttendanceTime, attendanceId, request
+      );
+
+      if (conflictAttendance) {
+        return response.status(400).json({
+          error: { message: "já existe um atendimento para este profissional nesta data e horário" },
+        });
       }
 
       const attendanceDTO: IAttendanceDTO = {
@@ -277,7 +297,7 @@ function normalizeAttendanceDate(value: string): string | null {
 
 function normalizeAttendanceTime(value: string): string | null {
   const raw = value.trim();
-  const match = raw.match(/^([01]\d|2[0-3]):([0-5]\d)$/);
+  const match = raw.match(/^([01]\d|2[0-3]):(00|30)$/);
   if (!match) {
     return null;
   }

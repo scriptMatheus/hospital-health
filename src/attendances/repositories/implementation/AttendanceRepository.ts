@@ -26,6 +26,28 @@ class AttendanceRepository implements IAttendanceRepository {
         return attendance;
     }
 
+    async findByProfessionalAndDateTime(
+        professionalId: string,
+        attendanceDate: string,
+        attendanceTime: string,
+        excludeAttendanceId: string | null,
+        conSource: DataSource
+    ): Promise<Attendance | null> {
+        this.attendanceRepository = conSource.getRepository(Attendance);
+        const qb = this.attendanceRepository.createQueryBuilder("attendance")
+            .where("attendance.professionalId = :professionalId", { professionalId })
+            .andWhere("DATE(attendance.attendanceDate) = :attendanceDate", { attendanceDate })
+            .andWhere("attendance.attendanceTime = :attendanceTime", { attendanceTime });
+
+        if (excludeAttendanceId) {
+            qb.andWhere("attendance.id != :excludeAttendanceId", { excludeAttendanceId });
+        }
+
+        const result = await qb.getOne();
+        await conSource.destroy();
+        return result;
+    }
+
     async save(attendance: Attendance, conSource:DataSource): Promise<Attendance|string> {
         this.attendanceRepository = conSource.getRepository(Attendance);
 

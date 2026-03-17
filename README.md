@@ -11,7 +11,7 @@
   <img src="https://img.shields.io/badge/Docker-Compose-2496ED?style=for-the-badge&logo=docker&logoColor=white" alt="Docker" />
 </p>
 
-API backend para gestão hospitalar, com autenticação por token, cadastro de instituições, profissionais, pacientes e vínculo entre instituição/profissional.
+API backend para gestão hospitalar, com autenticação por token, cadastro de instituições, profissionais, pacientes e atendimntos 
 
 ## Sumário
 
@@ -50,6 +50,7 @@ Módulos implementados:
 - `professionals`
 - `institutionProfessional`
 - `patients`
+- `attendances`
 
 ## Fluxograma de relacionamento
 
@@ -225,6 +226,14 @@ Retorno:
 - `PATCH /pacientes/:patientId`
 - `PATCH /pacientes/status/:patientId`
 
+### Atendimentos
+
+- `POST /atendimentos`
+- `GET /atendimentos`
+- `GET /atendimentos/:attendanceId`
+- `PATCH /atendimentos/:attendanceId`
+- `PATCH /atendimentos/status/:attendanceId`
+
 Observações:
 
 - Rotas protegidas exigem header `api-key` com token JWT válido.
@@ -245,8 +254,7 @@ npx jest auth.routes.test.ts --no-coverage
 npx jest institution.routes.test.ts --no-coverage
 npx jest professional.routes.test.ts --no-coverage
 npx jest patient.routes.test.ts --no-coverage
+npx jest attendance.routes.test.ts --no-coverage
 ```
 
 ---
-
-Desenvolvido para o projeto Hospital Health.

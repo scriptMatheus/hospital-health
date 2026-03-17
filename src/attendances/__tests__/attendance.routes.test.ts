@@ -11,6 +11,7 @@ jest.mock("../../utils/authenticateRequest", () => ({
 
 const mockAttendanceList = jest.fn();
 const mockAttendanceFindById = jest.fn();
+const mockAttendanceFindByProfessionalAndDateTime = jest.fn();
 const mockAttendanceCreate = jest.fn();
 const mockAttendanceUpdate = jest.fn();
 const mockAttendanceUpdateStatus = jest.fn();
@@ -19,6 +20,7 @@ jest.mock("../services/AttendanceService", () => ({
   AttendanceService: jest.fn().mockImplementation(() => ({
     list: mockAttendanceList,
     findById: mockAttendanceFindById,
+    findByProfessionalAndDateTime: mockAttendanceFindByProfessionalAndDateTime,
     createAttendance: mockAttendanceCreate,
     update: mockAttendanceUpdate,
     updateStatus: mockAttendanceUpdateStatus,
@@ -66,6 +68,7 @@ describe("POST /atendimentos", () => {
   it("deve criar atendimento e retornar 200", async () => {
     mockPatientFindById.mockResolvedValueOnce({ id: "patient-1" });
     mockProfessionalFindById.mockResolvedValueOnce({ id: "prof-1" });
+    mockAttendanceFindByProfessionalAndDateTime.mockResolvedValueOnce(null);
     mockAttendanceCreate.mockResolvedValueOnce(fakeAttendance);
 
     const response = await supertest(app)
@@ -74,6 +77,28 @@ describe("POST /atendimentos", () => {
 
     expect(response.status).toBe(200);
     expect(response.body).toMatchObject({ id: "attendance-1" });
+  });
+
+  it("deve retornar 400 quando hora não for múltiplo de 30 minutos", async () => {
+    const response = await supertest(app)
+      .post(`${BASE_URL}/atendimentos`)
+      .send({ patientId: "patient-1", professionalId: "prof-1", attendanceDate: "30/12/2099", attendanceTime: "20:15" });
+
+    expect(response.status).toBe(400);
+    expect(response.body.error.message).toMatch(/hora do atendimento inválida/);
+  });
+
+  it("deve retornar 400 quando já existe atendimento para o profissional na mesma data e horário", async () => {
+    mockPatientFindById.mockResolvedValueOnce({ id: "patient-1" });
+    mockProfessionalFindById.mockResolvedValueOnce({ id: "prof-1" });
+    mockAttendanceFindByProfessionalAndDateTime.mockResolvedValueOnce(fakeAttendance);
+
+    const response = await supertest(app)
+      .post(`${BASE_URL}/atendimentos`)
+      .send({ patientId: "patient-1", professionalId: "prof-1", attendanceDate: "30/12/2099", attendanceTime: "20:30" });
+
+    expect(response.status).toBe(400);
+    expect(response.body.error.message).toMatch(/já existe um atendimento/);
   });
 
   it("deve retornar 400 quando campos obrigatórios faltarem", async () => {
@@ -176,6 +201,7 @@ describe("PATCH /atendimentos/:attendanceId", () => {
     mockPatientFindById.mockResolvedValueOnce({ id: "patient-1" });
     mockProfessionalFindById.mockResolvedValueOnce({ id: "prof-1" });
     mockAttendanceFindById.mockResolvedValueOnce(fakeAttendance);
+    mockAttendanceFindByProfessionalAndDateTime.mockResolvedValueOnce(null);
     mockAttendanceUpdate.mockResolvedValueOnce(fakeAttendance);
 
     const response = await supertest(app)
@@ -183,6 +209,29 @@ describe("PATCH /atendimentos/:attendanceId", () => {
       .send({ patientId: "patient-1", professionalId: "prof-1", attendanceDate: "30/12/2099", attendanceTime: "20:30", description: "Retorno" });
 
     expect(response.status).toBe(200);
+  });
+
+  it("deve retornar 400 quando hora não for múltiplo de 30 minutos", async () => {
+    const response = await supertest(app)
+      .patch(`${BASE_URL}/atendimentos/attendance-1`)
+      .send({ patientId: "patient-1", professionalId: "prof-1", attendanceDate: "30/12/2099", attendanceTime: "20:45" });
+
+    expect(response.status).toBe(400);
+    expect(response.body.error.message).toMatch(/hora do atendimento inválida/);
+  });
+
+  it("deve retornar 400 quando já existe atendimento para o profissional na mesma data e horário", async () => {
+    mockPatientFindById.mockResolvedValueOnce({ id: "patient-1" });
+    mockProfessionalFindById.mockResolvedValueOnce({ id: "prof-1" });
+    mockAttendanceFindById.mockResolvedValueOnce(fakeAttendance);
+    mockAttendanceFindByProfessionalAndDateTime.mockResolvedValueOnce({ ...fakeAttendance, id: "attendance-2" });
+
+    const response = await supertest(app)
+      .patch(`${BASE_URL}/atendimentos/attendance-1`)
+      .send({ patientId: "patient-1", professionalId: "prof-1", attendanceDate: "30/12/2099", attendanceTime: "20:30" });
+
+    expect(response.status).toBe(400);
+    expect(response.body.error.message).toMatch(/já existe um atendimento/);
   });
 
   it("deve retornar 400 quando data e hora não forem futuras", async () => {

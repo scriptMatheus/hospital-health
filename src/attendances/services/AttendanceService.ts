@@ -23,6 +23,19 @@ class AttendanceService {
     return this.attendanceRepository.findById(attendanceId, prmNewCon);
   }
 
+  async findByProfessionalAndDateTime(
+    professionalId: string,
+    attendanceDate: string,
+    attendanceTime: string,
+    excludeAttendanceId: string | null,
+    req: any
+  ): Promise<Attendance | null> {
+    const prmNewCon = await this.defineConnection(req);
+    return this.attendanceRepository.findByProfessionalAndDateTime(
+      professionalId, attendanceDate, attendanceTime, excludeAttendanceId, prmNewCon
+    );
+  }
+
   async createAttendance(dto: IAttendanceDTO, req: any): Promise<Attendance | string> {
     const prmNewCon = await this.defineConnection(req);
 
